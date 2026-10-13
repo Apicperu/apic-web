@@ -174,11 +174,11 @@ export default function ProductDetailPage() {
                 <div className="flex flex-col gap-3 mb-6">
                   <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
                     <Shield className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm font-semibold text-green-800">🛡️ 1 Año de Garantía de Fábrica APIC</span>
+                    <span className="text-sm font-semibold text-green-800">1 Año de Garantía de Fábrica APIC</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
                     <Truck className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                    <span className="text-sm font-semibold text-blue-800">🚚 Envíos a Nivel Nacional</span>
+                    <span className="text-sm font-semibold text-blue-800">Envíos a Nivel Nacional</span>
                   </div>
                 </div>
 

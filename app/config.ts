@@ -370,7 +370,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    },// Fin de la familia "Plataforma Infinito"
     {
       id_seccion: 'plataforma-infinito-holograma',
       titulo_seccion: 'Plataforma Infinito Holograma',
@@ -492,7 +492,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    }, // Fin de la familia "Glass Booth"
     {
       id_seccion: 'tunel-pixel',
       titulo_seccion: 'Túnel Pixel',
@@ -725,7 +725,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    }, // Fin de la familia "Domos"
     {
       id_seccion: 'foto-cabina',
       titulo_seccion: 'Foto Cabina',
@@ -789,7 +789,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    }, // Fin de la familia "Foto Cabina"
     {
       id_seccion: 'aereo-360',
       titulo_seccion: 'Aéreo 360',
@@ -852,7 +852,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    }, // Fin de la familia "Balaustres"
     {
       id_seccion: 'cabina-espejada',
       titulo_seccion: 'Cabina Espejada',
@@ -906,7 +906,7 @@ export const WEBSITE_CONFIG = {
           precio_antes: null,
         },
       ],
-    },
+    }, // Fin de la familia "Cabina Espejada"
     {
       id_seccion: 'cabina-180-pro',
       titulo_seccion: 'Cabina 180 Pro',
