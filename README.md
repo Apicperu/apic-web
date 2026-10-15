@@ -1,177 +1,208 @@
-# APIC Perú — Web Platform
+# APIC Perú — Plataforma Web
 
 **Stack:** Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Turbopack · TypeScript
 
 ---
 
-## Table of Contents
+## Tabla de Contenidos
 
-**Part I — Developer Technical Guide**
-1. [Project Overview](#1-project-overview)
-2. [Tech Stack](#2-tech-stack)
-3. [Directory Architecture](#3-directory-architecture)
-4. [Quickstart & Commands](#4-quickstart--commands)
-5. [Routing Map](#5-routing-map)
-6. [Cart System Architecture](#6-cart-system-architecture)
-7. [Image Asset Convention](#7-image-asset-convention)
+**Parte I — Guía Técnica para Desarrolladores**
+1. [Resumen del Proyecto](#1-resumen-del-proyecto)
+2. [Stack Tecnológico](#2-stack-tecnológico)
+3. [Arquitectura de Directorios](#3-arquitectura-de-directorios)
+4. [Instalación y Comandos](#4-instalación-y-comandos)
+5. [Mapa de Rutas](#5-mapa-de-rutas)
+6. [Arquitectura del Carrito](#6-arquitectura-del-carrito)
+7. [Convención de Imágenes](#7-convención-de-imágenes)
+8. [Despliegue y Analíticas](#8-despliegue-y-analíticas)
 
 **Parte II — Guía Comercial para el Equipo APIC**
-8. [Manual de Autogestión del Catálogo (SSOT)](#8-manual-de-autogestión-del-catálogo-ssot)
-9. [Guía de Temas Estacionales](#9-guía-de-temas-estacionales)
-10. [Buenas Prácticas Finales](#10-buenas-prácticas-finales)
+9. [Manual de Autogestión del Catálogo (SSOT)](#9-manual-de-autogestión-del-catálogo-ssot)
+10. [Guía de Temas Estacionales](#10-guía-de-temas-estacionales)
+11. [Buenas Prácticas Finales](#11-buenas-prácticas-finales)
 
 ---
 
-# Part I — Developer Technical Guide
+# Parte I — Guía Técnica para Desarrolladores
 
-## 1. Project Overview
+## 1. Resumen del Proyecto
 
-APIC Perú is the commercial web platform for **APIC**, a Peruvian manufacturer
-of audiovisual and event equipment (360° platforms, geodesic domes, photo
-booths, LED structures, and related hardware). The application is built on
-**Next.js 16** using the App Router, with **React 19** powering all client
-interactivity and **Tailwind CSS v4** as the styling system, running on the
-**Turbopack** compiler for fast local iteration and production builds.
+APIC Perú es la plataforma web comercial de **APIC**, fabricante peruano de
+soluciones audiovisuales y equipos para eventos (plataformas 360°, domos
+geodésicos, cabinas fotográficas, estructuras LED y hardware relacionado). La
+aplicación está construida sobre **Next.js 16** con el App Router, usa
+**React 19** para toda la interactividad del cliente y **Tailwind CSS v4**
+como sistema de estilos. En desarrollo y en compilación se apoya en el
+compilador **Turbopack**.
 
-The architecture is deliberately split into two concerns that never leak
-into one another:
+La arquitectura separa dos responsabilidades que nunca se mezclan:
 
-- **Code** (this repository's `.tsx`/`.ts` files) owns layout, interaction,
-  state management, and rendering logic. It contains zero hardcoded catalog
-  data.
-- **Content** (a single file, `app/config.ts`) owns every editable fact about
-  the business: products, pricing, clearance flags, contact details, and
-  even the site's active color identity.
+- **Código** (los archivos `.tsx` y `.ts` del repositorio): define el diseño,
+  la interacción, el manejo de estado y la lógica de renderizado. No contiene
+  ningún dato de catálogo escrito a mano.
+- **Contenido** (un único archivo, `app/config.ts`): contiene todo lo que el
+  negocio puede editar. Es decir, productos, precios, marcas de oferta, datos
+  de contacto y la identidad de color activa del sitio.
 
-This separation means the APIC team can run the entire catalog, pricing, and
-seasonal branding lifecycle without opening a single `.tsx` file.
+Gracias a esta separación, el equipo de APIC puede gestionar el catálogo, los
+precios y la imagen estacional de la marca sin abrir ningún archivo `.tsx`.
 
-## 2. Tech Stack
+## 2. Stack Tecnológico
 
-| Layer | Technology |
+| Capa | Tecnología |
 |---|---|
 | Framework | Next.js 16 (App Router, Client Components) |
-| UI Library | React 19 |
-| Styling | Tailwind CSS v4 (utility classes + dynamic CSS custom properties) |
-| Dev/Build Compiler | Turbopack |
-| Language | TypeScript |
-| Cart State | Custom hook (`useCart`) backed by `localStorage` |
-| Dynamic Routing | File-based `[id]` segments for product and combo pages |
+| Librería de UI | React 19 |
+| Estilos | Tailwind CSS v4 (clases utilitarias + variables CSS dinámicas) |
+| Compilador / Servidor de desarrollo | Turbopack |
+| Lenguaje | TypeScript |
+| Estado del carrito | Contexto de React (`CartProvider` + hook `useCart`) con persistencia en `localStorage` |
+| Rutas dinámicas | Segmentos `[id]` basados en archivos para producto y combo |
+| Tipografías | Geist Sans y Geist Mono (`next/font/google`) |
+| Hosting y analíticas | Vercel + `@vercel/analytics` |
 
-## 3. Directory Architecture
+## 3. Arquitectura de Directorios
 
 ```
 app/
-├── config.ts                      # SSOT — all editable site content lives here
-├── layout.tsx                     # Root layout shared by every route
-├── globals.css                    # Global styles (includes scroll-behavior: smooth)
-├── page.tsx                       # Home: Hero, "Nosotros" section, Liquidación de Stock
+├── config.ts                      # SSOT — todo el contenido editable del sitio
+├── layout.tsx                     # Layout raíz: tipografías, metadata, CartProvider y Analytics
+├── globals.css                    # Estilos globales (incluye scroll-behavior: smooth)
+├── page.tsx                       # Home: Hero, sección "Nosotros", Liquidación de Stock
 │
 ├── hooks/
-│   └── useCart.ts                 # Cart hook — localStorage-backed selection state
+│   └── useCart.ts                 # CartProvider + hook useCart (selección persistida en localStorage)
 │
 ├── lib/
-│   └── catalogCardHelpers.ts      # Shared card helpers: badges, pricing, spec differentiation
+│   └── catalogCardHelpers.ts      # Helpers compartidos: insignias, precios, specs diferenciadoras
 │
 ├── productos/
 │   └── [id]/
-│       └── page.tsx               # Product detail: gallery, dynamic spec sheet, warranties,
-│                                   # WhatsApp CTA
+│       └── page.tsx               # Detalle de producto: galería, ficha técnica dinámica,
+│                                   # garantías y CTA de WhatsApp
 │
 └── combos/
     └── [id]/
-        └── page.tsx               # Family dashboard: sidebar + combo grid
-                                    # (accepts /combos/all as the unfiltered default)
+        └── page.tsx               # Dashboard por familia: sidebar + grilla de combos
+                                    # (acepta /combos/all como vista por defecto)
 ```
 
-**Key invariant:** `app/page.tsx`, `app/productos/[id]/page.tsx`, and
-`app/combos/[id]/page.tsx` read 100% of their product/pricing/theme data
-from `WEBSITE_CONFIG` and `THEME_CONFIG`, exported by `app/config.ts`. None
-of them contain inline catalog data.
+**Invariante clave:** `app/page.tsx`, `app/productos/[id]/page.tsx` y
+`app/combos/[id]/page.tsx` leen el 100% de sus datos de producto, precio y
+tema desde `WEBSITE_CONFIG` y `THEME_CONFIG`, exportados por `app/config.ts`.
+Ninguna de ellas contiene datos de catálogo escritos directamente en su código.
 
-## 4. Quickstart & Commands
+**Layout raíz (`app/layout.tsx`):** define las tipografías Geist, la metadata
+del sitio (título, descripción e íconos), envuelve toda la aplicación en
+`<CartProvider>` y renderiza el componente `<Analytics />` de Vercel
+únicamente cuando `NODE_ENV === 'production'`.
+
+## 4. Instalación y Comandos
 
 ```bash
-# 1. Install dependencies
+# 1. Instalar las dependencias
 npm install
 
-# 2. Start the development server (Turbopack)
+# 2. Iniciar el servidor de desarrollo (Turbopack)
 npm run dev
-# → available at http://localhost:3000
-# Edits to .tsx files and config.ts hot-reload instantly
+# → disponible en http://localhost:3000
+# Los cambios en archivos .tsx y en config.ts se recargan al instante
 
-# 3. Build for production
+# 3. Compilar para producción
 npm run build
 
-# 4. Serve the production build locally
+# 4. Servir la compilación de producción de forma local
 npm start
-# → available at http://localhost:3000, serving the optimized build
+# → disponible en http://localhost:3000, sirviendo la versión optimizada
 ```
 
-## 5. Routing Map
+## 5. Mapa de Rutas
 
-| Route | Description |
+| Ruta | Descripción |
 |---|---|
-| `/` | Home — corporate hero, "Nosotros" section, Liquidación de Stock grid |
-| `/productos/[id]` | Single product detail page (`id` is numeric, unique across the catalog) |
-| `/combos/[id]` | Family dashboard (`id` is the family's `id_seccion` slug, e.g. `plataforma-360`) |
-| `/combos/all` | Same dashboard with no family preselected — defaults to the first family |
+| `/` | Home: hero corporativo, sección "Nosotros" y grilla de Liquidación de Stock |
+| `/productos/[id]` | Detalle de un producto (`id` numérico, único en todo el catálogo) |
+| `/combos/[id]` | Dashboard de una familia (`id` es el `id_seccion` de la familia, p. ej. `plataforma-360`) |
+| `/combos/all` | El mismo dashboard sin familia preseleccionada: activa la primera por defecto |
 
-## 6. Cart System Architecture
+## 6. Arquitectura del Carrito
 
-`app/hooks/useCart.ts` is a standalone hook providing:
+El carrito vive en `app/hooks/useCart.ts` y se compone de dos piezas:
 
-- `selectedItems` — the current cart contents (product names), held in state
-  and persisted to `localStorage` so selections survive page reloads.
-- `toggleItem(nombre)` — add/remove a product by name, callable from any
-  catalog card across all three pages.
-- The quotation summary modal reads `selectedItems` directly to build a
-  pre-formatted WhatsApp message, sent to the number configured in
-  `WEBSITE_CONFIG.numero_whatsapp`.
+- **`CartProvider`**: contexto de React que envuelve toda la aplicación desde
+  `app/layout.tsx`. Mantiene la selección en estado, la carga desde
+  `localStorage` una sola vez después del montaje en el cliente y la guarda
+  cada vez que cambia. También se sincroniza entre pestañas del navegador
+  mediante los eventos `storage` y `focus`.
+- **`useCart()`**: hook que expone `selectedItems` (la lista de productos
+  seleccionados, por nombre) y `toggleItem(nombre)` para añadir o quitar un
+  producto desde cualquier tarjeta de las tres páginas. Si se usa fuera de
+  un `CartProvider`, lanza un error explícito.
 
-No component maintains its own parallel cart state — `useCart` is the single
-source of truth for cart contents app-wide.
+El modal "Resumen de Cotización" lee `selectedItems` y arma un mensaje
+preformateado que se envía por WhatsApp al número configurado en
+`WEBSITE_CONFIG.numero_whatsapp`.
 
-## 7. Image Asset Convention
+Ningún componente mantiene su propio estado de carrito paralelo:
+`CartProvider` es la única fuente de verdad del contenido del carrito en toda
+la aplicación.
 
-Product photography is served from `/public/equipos/`, organized by family
-and combo tier:
+## 7. Convención de Imágenes
+
+La fotografía de producto se sirve desde `/public/equipos/`, organizada por
+familia y nivel de combo:
 
 ```
 public/equipos/PLATAFORMA-360º/COMBO 1/PLATAFORMA 360_IMG 1 PLAT 01.jpg
 public/equipos/PLATAFORMA-360º/COMBO 2/PLATAFORMA 360_IMG 1 PLAT 02.jpg
 ```
 
-Each product references its images via `imagenes_galeria`, an array of paths
-relative to `/public`. The first entry in the array is used as the card
-thumbnail; any number of additional images populate the product gallery.
+Cada producto referencia sus imágenes en `imagenes_galeria`, un arreglo de
+rutas relativas a `/public`. La primera imagen del arreglo se usa como
+miniatura en las tarjetas; el resto completa la galería del producto.
+
+## 8. Despliegue y Analíticas
+
+El sitio se publica en **Vercel**. Cada `git push` a la rama conectada genera
+un nuevo despliegue automático.
+
+Las analíticas de visitas usan `@vercel/analytics`:
+
+- El paquete debe figurar en las `dependencies` del `package.json`. Si falta,
+  se instala con `npm i @vercel/analytics`.
+- `<Analytics />` se renderiza solo en producción (`NODE_ENV === 'production'`),
+  por lo que con `npm run dev` no se registran visitas.
+- Para ver los datos, se debe habilitar Analytics en el panel del proyecto en
+  Vercel (pestaña **Analytics**) y navegar por el sitio ya publicado. Los
+  datos aparecen en aproximadamente 30 segundos.
+- Los bloqueadores de anuncios pueden impedir el registro de visitas durante
+  las pruebas.
 
 ---
 
 # Parte II — Guía Comercial para el Equipo APIC
 
-*A partir de aquí, esta guía está escrita en español, dirigida al equipo de
-APIC que administrará el catálogo y la identidad visual del sitio sin
-necesidad de conocimientos de programación.*
+*Esta parte está dirigida al equipo de APIC que administrará el catálogo y la
+identidad visual del sitio sin necesidad de conocimientos de programación.*
 
-## 8. Manual de Autogestión del Catálogo (SSOT)
+## 9. Manual de Autogestión del Catálogo (SSOT)
 
-Todo el catálogo vive dentro de un solo archivo: **`app/config.ts`**. Ahí
-encontrarán `WEBSITE_CONFIG.secciones_catalogo`: una lista de **familias de
+Todo el catálogo vive dentro de un solo archivo: **`app/config.ts`**. Ahí se
+encuentra `WEBSITE_CONFIG.secciones_catalogo`: una lista de **familias de
 producto** (por ejemplo, "Plataforma 360" o "Domos"). Cada familia contiene
-una lista interna de **productos** — uno por cada nivel Combo (Combo 1,
+una lista interna de **productos**, uno por cada nivel Combo (Combo 1,
 Combo 2, etc.). Cada Combo es una tarjeta independiente en la tienda, con su
 propio precio, fotos y ficha técnica.
 
 El archivo incluye, como referencia, el primer producto del catálogo
-(Plataforma 360 — Combo 1) completamente comentado campo por campo. El resto
-de los productos sigue exactamente ese mismo patrón.
+(Plataforma 360 — Combo 1) comentado campo por campo. El resto de los
+productos sigue exactamente ese mismo patrón.
 
-### 8.1. Cómo actualizar un precio en soles
+### 9.1. Cómo actualizar un precio en soles
 
-Cada producto tiene un arreglo llamado `especificaciones`: una lista de
-textos con el formato `'Clave: Valor'`. El precio es la línea que empieza
-con `"Costo:"` o `"Precio:"`:
+Cada producto tiene un arreglo llamado `especificaciones`: una lista de textos
+con el formato `'Clave: Valor'`. El precio es la línea que empieza con
+`"Costo:"` o `"Precio:"`:
 
 ```
 especificaciones: [
@@ -182,32 +213,32 @@ especificaciones: [
 ],
 ```
 
-**Esta es la única línea que debe cambiarse.** La ficha técnica que el
-cliente ve en la pestaña "Ficha Técnica" del producto se genera
-automáticamente a partir de esta misma lista — no existe un segundo lugar
-donde el precio deba repetirse ni mantenerse sincronizado a mano.
+**Esta es la única línea que debe cambiarse.** La ficha técnica que el cliente
+ve en la pestaña "Ficha Técnica" del producto se genera automáticamente a
+partir de esta misma lista. No existe un segundo lugar donde el precio deba
+repetirse ni mantenerse sincronizado a mano.
 
 > **Límite de seguridad de TypeScript:** el precio es siempre un texto
 > (string) entre comillas simples `'...'`. No se debe borrar ninguna de las
-> dos comillas, ni la coma al final de la línea — ambas son necesarias para
-> que el archivo siga siendo válido y el sitio no deje de compilar.
+> dos comillas ni la coma al final de la línea. Ambas son necesarias para que
+> el archivo siga siendo válido y el sitio no deje de compilar.
 
-### 8.2. Cómo agregar una nueva familia de equipos
+### 9.2. Cómo agregar una nueva familia de equipos
 
-Para dar de alta una familia nueva dentro de `secciones_catalogo`, se copia
-la siguiente estructura completa, se pega al final de la lista de familias
-existentes, y se reemplazan los valores:
+Para dar de alta una familia nueva dentro de `secciones_catalogo`, se copia la
+siguiente estructura completa, se pega al final de la lista de familias
+existentes y se reemplazan los valores:
 
 ```
 {
-  id_seccion: 'nombre-slug-sin-espacios',   // usado en la URL /combos/nombre-slug-sin-espacios
+  id_seccion: 'nombre-slug-sin-espacios',   // se usa en la URL /combos/nombre-slug-sin-espacios
   titulo_seccion: 'Nombre Visible de la Familia',
   productos: [
     {
-      id: 30,   // debe ser único en TODO el catálogo — ningún otro producto puede repetir este número
+      id: 30,   // debe ser único en TODO el catálogo: ningún otro producto puede repetirlo
       nombre: 'Nombre Visible de la Familia — Combo 1',
       sku: 'ABC-EVT-001-C1',
-      categoria: 'Nombre Visible de la Familia',   // debe coincidir con 'titulo_seccion' de arriba
+      categoria: 'Nombre Visible de la Familia',   // debe coincidir con 'titulo_seccion'
       especificaciones: [
         'Clave 1: Valor 1',
         'Clave 2: Valor 2',
@@ -229,18 +260,18 @@ existentes, y se reemplazan los valores:
 ```
 
 Una vez guardado el archivo, la nueva familia aparece **automáticamente** en
-el Mega Menu, en el dashboard de combos (`/combos/[id]`), y en cualquier
-cálculo del catálogo general. No es necesario editar `app/page.tsx` ni
-ningún otro archivo del proyecto.
+el Mega Menu, en el dashboard de combos (`/combos/[id]`) y en cualquier
+cálculo del catálogo general. No es necesario editar `app/page.tsx` ni ningún
+otro archivo del proyecto.
 
-> **Zona técnica — no tocar:** al final de `config.ts`, después del
-> comentario "ZONA TÉCNICA — NO EDITAR A PARTIR DE AQUÍ", el archivo combina
+> **Zona técnica, no tocar:** al final de `config.ts`, después del comentario
+> "ZONA TÉCNICA — NO EDITAR A PARTIR DE AQUÍ", el archivo combina
 > automáticamente todas las familias en una sola lista interna
-> (`CATALOGO_GENERAL`) que usan las páginas de producto y de combos para
+> (`CATALOGO_GENERAL`), que usan las páginas de producto y de combos para
 > buscar cualquier artículo. Esa sección es lógica de programación, no datos
-> de catálogo — modificarla puede romper la compilación del sitio.
+> de catálogo. Modificarla puede romper la compilación del sitio.
 
-### 8.3. Cómo gestionar una oferta de Liquidación de Stock, sin romper nada
+### 9.3. Cómo gestionar una oferta de Liquidación de Stock sin romper nada
 
 Cada producto tiene dos campos dedicados exclusivamente a esto:
 
@@ -249,74 +280,71 @@ en_oferta: true,
 precio_antes: 'Precio Antes: 2600 soles',
 ```
 
-- **Para poner un producto en oferta:** cambiar `en_oferta` a `true`, y
-  escribir el precio anterior en `precio_antes`, respetando el mismo formato
-  de texto que ya usan los demás productos (`'Precio Antes: XXXX soles'`,
-  entre comillas simples).
-- **Para quitar un producto de oferta:** cambiar `en_oferta` a `false`, y
-  `precio_antes` a `null` (sin comillas — `null` es una palabra especial que
+- **Para poner un producto en oferta:** cambiar `en_oferta` a `true` y escribir
+  el precio anterior en `precio_antes`, respetando el mismo formato de texto
+  que usan los demás productos (`'Precio Antes: XXXX soles'`, entre comillas
+  simples).
+- **Para quitar un producto de oferta:** cambiar `en_oferta` a `false` y
+  `precio_antes` a `null` (sin comillas: `null` es una palabra especial que
   significa "sin valor", no un texto).
 
 El sitio calcula el porcentaje de descuento automáticamente, comparando
 `precio_antes` contra el precio vigente del producto, y lo muestra como una
-insignia (por ejemplo, `-15%`) sobre la tarjeta, tanto en la sección
-"Liquidación de Stock" del Home como en el detalle del producto.
+insignia (por ejemplo, `-15%`) sobre la tarjeta en la sección "Liquidación de
+Stock" del Home y en el detalle del producto.
 
-**Para mantener la compilación del sitio sin errores**, respetar siempre:
+**Para mantener la compilación sin errores, respetar siempre:**
 - `en_oferta` solo acepta `true` o `false` (sin comillas, en minúsculas).
-- `precio_antes` solo acepta un texto entre comillas simples, o la palabra
-  `null` — nunca dejarlo vacío ni borrar la línea completa.
+- `precio_antes` solo acepta un texto entre comillas simples o la palabra
+  `null`. Nunca debe quedar vacío ni borrarse la línea completa.
 
-## 9. Guía de Temas Estacionales
+## 10. Guía de Temas Estacionales
 
-Toda la identidad de color del sitio —botones, enlaces, insignias de oferta,
+Toda la identidad de color del sitio (botones, enlaces, insignias de oferta,
 el brillo ambiental de las tarjetas "Nosotros" y los bordes del pie de
-página— se controla desde **una sola variable**, ubicada en la parte
-superior de `app/config.ts`:
+página) se controla desde **una sola variable**, ubicada en la parte superior
+de `app/config.ts`:
 
 ```
 export const TEMA_ACTIVO: keyof typeof THEME_SCHEMES = 'PRO_DEFAULT'
 ```
 
-Para cambiar la paleta de colores de **todo el sitio, de forma instantánea y
-en armonía total entre todas las páginas**, basta con reemplazar el texto
-entre comillas por una de estas tres opciones (deben escribirse exactamente
-así, con mayúsculas y guion bajo):
+Para cambiar la paleta de **todo el sitio de forma instantánea y con total
+armonía entre páginas**, basta con reemplazar el texto entre comillas por una
+de estas tres opciones (deben escribirse exactamente así, con mayúsculas y
+guion bajo):
 
 | Esquema | Identidad | Color primario |
 |---|---|---|
-| `'PRO_DEFAULT'` | Turquesa Corporativo — identidad de siempre | `#039dbf` |
-| `'WARM_SEASON'` | Cobre Cálido Cinemático — campañas de verano / aniversario | `#c2703d` |
-| `'HOLIDAY_PREMIUM'` | Carmín Profundo de Lujo — campañas navideñas / fin de año | `#9b1b30` |
+| `'PRO_DEFAULT'` | Turquesa Corporativo: la identidad de siempre | `#039dbf` |
+| `'WARM_SEASON'` | Cobre Cálido Cinemático: campañas de verano y aniversario | `#c2703d` |
+| `'HOLIDAY_PREMIUM'` | Carmín Profundo de Lujo: campañas navideñas y de fin de año | `#9b1b30` |
 
 No es necesario modificar ningún otro archivo del proyecto. Las tres páginas
-principales (`app/page.tsx`, `app/productos/[id]/page.tsx`,
-`app/combos/[id]/page.tsx`) leen sus colores a través de variables CSS
-inyectadas dinámicamente a partir de `TEMA_ACTIVO` en tiempo de ejecución, de
-modo que el cambio se propaga en cascada e instantáneamente a toda la
-plataforma: botones, enlaces, insignias y bordes decorativos cambian juntos,
-como un conjunto ya balanceado — nunca de forma aislada ni descoordinada.
+principales (`app/page.tsx`, `app/productos/[id]/page.tsx` y
+`app/combos/[id]/page.tsx`) leen sus colores mediante variables CSS que se
+inyectan a partir de `TEMA_ACTIVO`. Por eso el cambio se propaga en cascada a
+toda la plataforma: botones, enlaces, insignias y bordes decorativos cambian
+juntos, como un conjunto balanceado y nunca de forma aislada.
 
 Cada esquema define, además del color principal, un tono de hover, un
-degradado radial para el brillo ambiental de las tarjetas "Nosotros", y un
-tono dedicado para las insignias de oferta. Los tres esquemas fueron
-diseñados como paletas completas para mantener contraste y legibilidad sin
-importar cuál esté activo.
+degradado radial para el brillo ambiental de las tarjetas "Nosotros" y un tono
+dedicado para las insignias de oferta. Los tres esquemas fueron diseñados como
+paletas completas para mantener el contraste y la legibilidad sin importar
+cuál esté activo.
 
-## 10. Buenas Prácticas Finales
+## 11. Buenas Prácticas Finales
 
 - **No se requieren cambios de código** para actualizar precios, fotos,
-  ofertas o el tema de color activo del sitio — todo vive en
-  `app/config.ts`.
+  ofertas o el tema de color activo: todo vive en `app/config.ts`.
 - Antes de publicar cambios grandes en producción, se recomienda revisar
-  visualmente el Home, el detalle de un producto, y el dashboard de combos
-  tras cualquier edición extensa en `config.ts`, para confirmar que los
-  datos se muestran correctamente.
+  visualmente el Home, el detalle de un producto y el dashboard de combos tras
+  cualquier edición extensa de `config.ts`, para confirmar que los datos se
+  muestran correctamente.
 - Al copiar un producto o una familia como plantilla para crear uno nuevo,
-  verificar siempre que el `id` del producto sea único en todo el catálogo —
-  es el único campo donde un valor repetido puede causar comportamiento
+  verificar siempre que el `id` del producto sea único en todo el catálogo. Es
+  el único campo donde un valor repetido puede causar comportamiento
   inesperado en el sitio.
-- Si se agrega un cuarto esquema de color en el futuro, se recomienda seguir
-  exactamente la misma estructura de campos que los tres esquemas
-  existentes, para que el resto del sitio lo reconozca sin cambios
-  adicionales de código.
+- Si en el futuro se agrega un cuarto esquema de color, se recomienda seguir
+  exactamente la misma estructura de campos que usan los tres existentes,
+  para que el resto del sitio lo reconozca sin cambios adicionales de código.
